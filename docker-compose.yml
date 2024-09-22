@@ -1,0 +1,82 @@
+name: radio-homework
+
+networks:
+  public-tier:
+  private-tier:
+    internal: true
+
+configs:
+  nginx_default:
+    file: docker/radio/virtual_host.conf
+  radio_liq:
+    file: docker/radio/radio.liq
+  icecast_xml:
+    file: icecast/icecast.xml
+
+secrets:
+  icecast_source_password:
+    file: ./docker/secrets/icecast_source_password
+  icecast_relay_password:
+    file: ./docker/secrets/icecast_relay_password
+  icecast_admin_username:
+    file: ./docker/secrets/icecast_admin_username
+  icecast_admin_password:
+    file: ./docker/secrets/icecast_admin_password
+
+services:
+  icecast:
+    container_name: icecast
+    build:
+      context: icecast
+      args:
+        - ICECAST_SOURCE_PASSWORD=${ICECAST_SOURCE_PASSWORD}
+        - ICECAST_RELAY_PASSWORD=${ICECAST_RELAY_PASSWORD}
+        - ICECAST_ADMIN_USERNAME=${ICECAST_ADMIN_USERNAME}
+        - ICECAST_ADMIN_PASSWORD=${ICECAST_ADMIN_PASSWORD}
+    restart: unless-stopped
+    configs:
+      - source: icecast_xml
+        target: /etc/icecast2/icecast.xml
+    networks:
+      - private-tier
+    secrets:
+      - icecast_source_password
+      - icecast_relay_password
+      - icecast_admin_username
+      - icecast_admin_password
+
+  liquidsoap:
+    container_name: liquidsoap
+    image: savonet/liquidsoap:v2.2.5
+    restart: unless-stopped
+    depends_on:
+      - icecast
+    networks:
+      - private-tier
+    configs:
+      - source: radio_liq
+        target: /etc/radio/radio_liq
+    secrets:
+      - icecast_source_password
+    environment:
+      - ICECAST_HOST=${ICECAST_HOST}
+      - ICECAST_PORT=${ICECAST_PORT}
+      - ICECAST_PASSWORD_FILE=${ICECAST_SOURCE_PASSWORD}
+    command: [
+      "/etc/radio/radio_liq"
+    ]
+
+  server:
+    container_name: nginx
+    image: nginx:1.27-bookworm
+    restart: unless-stopped
+    depends_on:
+      - icecast
+    networks:
+      - private-tier
+      - public-tier
+    ports:
+      - "80:80"
+    configs:
+      - source: nginx_default
+        target: /etc/nginx/conf.d/default.conf
