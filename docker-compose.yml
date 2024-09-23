@@ -39,6 +39,11 @@ services:
       - icecast_relay_password
       - icecast_admin_username
       - icecast_admin_password
+    environment:
+      - ICECAST_SOURCE_PASSWORD_FILE=${ICECAST_SOURCE_PASSWORD}
+      - ICECAST_RELAY_PASSWORD_FILE=${ICECAST_RELAY_PASSWORD}
+      - ICECAST_ADMIN_USERNAME_FILE=${ICECAST_ADMIN_USERNAME}
+      - ICECAST_ADMIN_PASSWORD_FILE=${ICECAST_ADMIN_PASSWORD}
 
   liquidsoap:
     container_name: liquidsoap
