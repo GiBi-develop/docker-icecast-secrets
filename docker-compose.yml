@@ -28,11 +28,6 @@ services:
     container_name: icecast
     build:
       context: icecast
-      args:
-        - ICECAST_SOURCE_PASSWORD=${ICECAST_SOURCE_PASSWORD}
-        - ICECAST_RELAY_PASSWORD=${ICECAST_RELAY_PASSWORD}
-        - ICECAST_ADMIN_USERNAME=${ICECAST_ADMIN_USERNAME}
-        - ICECAST_ADMIN_PASSWORD=${ICECAST_ADMIN_PASSWORD}
     restart: unless-stopped
     configs:
       - source: icecast_xml

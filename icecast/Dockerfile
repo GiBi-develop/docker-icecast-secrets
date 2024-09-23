@@ -16,11 +16,6 @@ RUN apt update \
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-ARG ICECAST_SOURCE_PASSWORD
-ARG ICECAST_RELAY_PASSWORD
-ARG ICECAST_ADMIN_USERNAME
-ARG ICECAST_ADMIN_PASSWORD
-
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 USER icecast2

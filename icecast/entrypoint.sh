@@ -2,6 +2,16 @@
 
 set -e
 
+if [ -z "$ICECAST_SOURCE_PASSWORD_FILE" ] || [ -z "$ICECAST_RELAY_PASSWORD_FILE" ] || [ -z "$ICECAST_ADMIN_USERNAME_FILE" ] || [ -z "$ICECAST_ADMIN_PASSWORD_FILE" ]; then
+    echo "Заданы не все секреты."
+    exit 1
+fi
+
+ICECAST_SOURCE_PASSWORD=$(cat "$ICECAST_SOURCE_PASSWORD_FILE")
+ICECAST_RELAY_PASSWORD=$(cat "$ICECAST_RELAY_PASSWORD_FILE")
+ICECAST_ADMIN_USERNAME=$(cat "$ICECAST_ADMIN_USERNAME_FILE")
+ICECAST_ADMIN_PASSWORD=$(cat "$ICECAST_ADMIN_PASSWORD_FILE")
+
 xmlstarlet ed \
     -u "/icecast/authentication/source-password" -v "${ICECAST_SOURCE_PASSWORD}" \
     -u "/icecast/authentication/relay-password" -v "${ICECAST_RELAY_PASSWORD}" \
