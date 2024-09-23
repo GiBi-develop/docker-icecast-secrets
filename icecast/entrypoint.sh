@@ -19,10 +19,10 @@ xmlstarlet ed \
     -u "/icecast/admin/password" -v "${ICECAST_ADMIN_PASSWORD}" \
     /etc/icecast2/icecast.xml > /tmp/icecast.xml
 
-if [ -z $(xmlstarlet sel -t -v "/icecast/authentication/source-password" /etc/icecast2/icecast.xml 2>/dev/null) ] ||
-   [ -z $(xmlstarlet sel -t -v "/icecast/authentication/relay-password" /etc/icecast2/icecast.xml 2>/dev/null) ] ||
-   [ -z $(xmlstarlet sel -t -v "/icecast/admin/username" /etc/icecast2/icecast.xml 2>/dev/null) ] ||
-   [ -z $(xmlstarlet sel -t -v "/icecast/admin/password" /etc/icecast2/icecast.xml 2>/dev/null) ]; then
+if [ -z "$(xmlstarlet sel -t -v '/icecast/authentication/source-password' /etc/icecast2/icecast.xml 2>/dev/null)" ] ||
+   [ -z "$(xmlstarlet sel -t -v '/icecast/authentication/relay-password' /etc/icecast2/icecast.xml 2>/dev/null)" ] ||
+   [ -z "$(xmlstarlet sel -t -v '/icecast/admin/username' /etc/icecast2/icecast.xml 2>/dev/null)" ] ||
+   [ -z "$(xmlstarlet sel -t -v '/icecast/admin/password' /etc/icecast2/icecast.xml 2>/dev/null)" ]; then
     echo "Заданы не все секреты."
     exit 1
 fi
