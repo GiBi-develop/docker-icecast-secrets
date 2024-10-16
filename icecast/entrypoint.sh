@@ -1,31 +1,38 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -e
 
-if [ -z "$ICECAST_SOURCE_PASSWORD_FILE" ]; then
-    echo "Не задан секрет ICECAST_SOURCE_PASSWORD"
-    exit 1
-fi
+# Функция для чтения значений из переменной или файла
+get_value() {
+  var_name="$1"
+  file_var_name="${var_name}_FILE"
 
-if [ -z "$ICECAST_RELAY_PASSWORD_FILE" ]; then
-    echo "Не задан секрет ICECAST_RELAY_PASSWORD"
-    exit 1
-fi
+  # Проверка на наличие переменной _FILE
+  if [ -n "${!file_var_name}" ]; then
+    # Если переменная _FILE существует, читаем значение из файла
+    if [ -f "${!file_var_name}" ]; then
+      cat "${!file_var_name}"
 
-if [ -z "$ICECAST_ADMIN_USERNAME_FILE" ]; then
-    echo "Не задан секрет ICECAST_ADMIN_USERNAME"
-    exit 1
-fi
+    else
+      echo "Ошибка: файл ${!file_var_name} не найден."
+      exit 1
+    fi
+  else
+    # Если переменная _FILE не существует, проверяем наличие обычной переменной
+    if [ -z "${!var_name}" ]; then
+      echo "Ошибка: переменная ${var_name} не задана."
+      exit 1
+    else
+      echo "${!var_name}"
+    fi
+  fi
+}
 
-if [ -z "$ICECAST_ADMIN_PASSWORD_FILE" ]; then
-    echo "Не задан секрет ICECAST_ADMIN_PASSWORD"
-    exit 1
-fi
-
-ICECAST_SOURCE_PASSWORD=$(cat "$ICECAST_SOURCE_PASSWORD_FILE")
-ICECAST_RELAY_PASSWORD=$(cat "$ICECAST_RELAY_PASSWORD_FILE")
-ICECAST_ADMIN_USERNAME=$(cat "$ICECAST_ADMIN_USERNAME_FILE")
-ICECAST_ADMIN_PASSWORD=$(cat "$ICECAST_ADMIN_PASSWORD_FILE")
+# Чтение переменных окружения или файлов-секретов
+ICECAST_SOURCE_PASSWORD=$(get_value ICECAST_SOURCE_PASSWORD)
+ICECAST_RELAY_PASSWORD=$(get_value ICECAST_RELAY_PASSWORD)
+ICECAST_ADMIN_USERNAME=$(get_value ICECAST_ADMIN_USERNAME)
+ICECAST_ADMIN_PASSWORD=$(get_value ICECAST_ADMIN_PASSWORD)
 
 xmlstarlet ed \
     -u "/icecast/authentication/source-password" -v "${ICECAST_SOURCE_PASSWORD}" \
